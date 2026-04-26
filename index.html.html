@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMSORG Dynamic Pricing & Margin Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1e40af;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .reset-btn {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 24px;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input[type="number"]:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1e40af;
+        }
+
+        .form-group input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #d1d5db;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .form-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1e40af;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .form-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1e40af;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .quick-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #e5e7eb;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn.active {
+            background: #1e40af;
+            color: white;
+        }
+
+        .quick-btn:hover {
+            background: #d1d5db;
+        }
+
+        .quick-btn.active:hover {
+            background: #1e3a8a;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .result-box {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #1e40af;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .result-box.green {
+            background: #ecfdf5;
+            border-left-color: #10b981;
+        }
+
+        .result-box.green .result-value {
+            color: #059669;
+        }
+
+        .result-box.yellow {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .result-box.yellow .result-value {
+            color: #d97706;
+        }
+
+        .result-box.red {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+
+        .result-box.red .result-value {
+            color: #dc2626;
+        }
+
+        .breakdown {
+            background: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+
+        .breakdown-row.total {
+            border-top: 2px solid #d1d5db;
+            padding-top: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .warning {
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+            font-size: 13px;
+            color: #991b1b;
+        }
+
+        .table-section {
+            margin-top: 24px;
+        }
+
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .price-table th,
+        .price-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+
+        .price-table th {
+            background: #f3f4f6;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .price-table input[type="number"] {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .duration-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .duration-btn {
+            padding: 10px;
+            border: 2px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .duration-btn.active {
+            background: #1e40af;
+            color: white;
+            border-color: #1e40af;
+        }
+
+        .duration-btn:hover:not(.active) {
+            border-color: #1e40af;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            margin-top: 32px;
+        }
+
+        .recommendation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .rec-card {
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .rec-card.green {
+            background: #ecfdf5;
+            border-left-color: #10b981;
+        }
+
+        .rec-card h3 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #059669;
+        }
+
+        .rec-card.yellow {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .rec-card.yellow h3 {
+            color: #d97706;
+        }
+
+        .rec-card.purple {
+            background: #f3e8ff;
+            border-left-color: #a855f7;
+        }
+
+        .rec-card.purple h3 {
+            color: #7e22ce;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>OMSORG</h1>
+                <p>Dynamic Pricing & Margin Builder (With ANM)</p>
+            </div>
+            <button class="reset-btn" onclick="resetForm()">↻ Reset</button>
+        </div>
+
+        <div class="grid">
+            <!-- LEFT: Controls -->
+            <div class="card">
+                <h2>Inputs & Settings</h2>
+
+                <div class="form-group">
+                    <label>Employee Salary (₹)</label>
+                    <input type="number" id="salary" value="25000" step="1000" min="0" onchange="updateDisplay()" oninput="updateDisplay()">
+                    <div style="font-size: 11px; color: #999; margin-top: 4px;">Max staff salary for this role</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Overhead %: <span id="overheadDisplay">8</span>%</label>
+                    <input type="range" id="overhead" min="0" max="20" value="8" onchange="updateDisplay()" oninput="updateDisplay()">
+                    <div style="font-size: 11px; color: #999; margin-top: 4px;">Includes: turnover, training, admin</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Markup %: <span id="markupDisplay">35</span>%</label>
+                    <input type="range" id="markup" min="20" max="60" value="35" onchange="updateDisplay()" oninput="updateDisplay()">
+                    <div style="font-size: 11px; color: #999; margin-top: 4px;">Your profit margin target</div>
+                </div>
+
+                <div class="form-group">
+                    <label>GST %: <span id="gstDisplay">18</span>%</label>
+                    <input type="number" id="gst" value="18" step="0.5" min="0" max="28" onchange="updateDisplay()" oninput="updateDisplay()">
+                    <div style="font-size: 11px; color: #999; margin-top: 4px;">Tax rate (5% or 18%)</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Service Type</label>
+                    <select id="serviceType" onchange="updateDisplay()">
+                        <option value="GDA">GDA (General Daily Assistant)</option>
+                        <option value="ANM">ANM (Semi-Nurse)</option>
+                        <option value="Nurse">Nurse (Full RN)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Duration</label>
+                    <div class="duration-buttons">
+                        <button class="duration-btn" onclick="setDuration(event, '8')">8h</button>
+                        <button class="duration-btn" onclick="setDuration(event, '12')">12h</button>
+                        <button class="duration-btn active" onclick="setDuration(event, '24')">24h</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Discount %: <span id="discountDisplay">0</span>%</label>
+                    <input type="range" id="discount" min="0" max="30" value="0" onchange="updateDisplay()" oninput="updateDisplay()">
+                    <div class="button-group">
+                        <button class="quick-btn" onclick="setDiscount(0)">0%</button>
+                        <button class="quick-btn" onclick="setDiscount(5)">5%</button>
+                        <button class="quick-btn" onclick="setDiscount(10)">10%</button>
+                        <button class="quick-btn" onclick="setDiscount(15)">15%</button>
+                        <button class="quick-btn" onclick="setDiscount(20)">20%</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Results -->
+            <div>
+                <div class="card">
+                    <h2>Cost Breakdown</h2>
+                    <div class="breakdown">
+                        <div class="breakdown-row">
+                            <span>Staff Salary:</span>
+                            <span id="salaryDisplay">₹25,000</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span>Overhead:</span>
+                            <span id="overheadAmountDisplay">₹2,000</span>
+                        </div>
+                        <div class="breakdown-row total">
+                            <span>Total Cost:</span>
+                            <span id="totalCostDisplay">₹27,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Price Calculation</h2>
+                    <div class="breakdown">
+                        <div class="breakdown-row">
+                            <span>Total Cost:</span>
+                            <span id="costDisplay2">₹27,000</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span>Markup:</span>
+                            <span id="markupAmountDisplay" style="color: #10b981;">+₹9,450</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span>Pre-GST:</span>
+                            <span id="preGstDisplay">₹36,450</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span>GST:</span>
+                            <span id="gstAmountDisplay" style="color: #a855f7;">+₹6,561</span>
+                        </div>
+                        <div class="breakdown-row total">
+                            <span>Calculated Price:</span>
+                            <span id="calculatedPriceDisplay">₹43,011</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Final Price to Customer</h2>
+                    <div class="breakdown">
+                        <div class="breakdown-row">
+                            <span>Calculated Price:</span>
+                            <span id="calcDisplay">₹43,011</span>
+                        </div>
+                        <div class="breakdown-row" id="discountRow" style="display:none;">
+                            <span>Discount:</span>
+                            <span id="discountAmountDisplay" style="color: #dc2626;">-₹0</span>
+                        </div>
+                        <div class="breakdown-row total">
+                            <span>Final Price:</span>
+                            <span id="finalPriceDisplay">₹43,011</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Your Margin Analysis</h2>
+                    <div class="results-grid">
+                        <div class="result-box">
+                            <div class="result-label">Total Margin (₹)</div>
+                            <div class="result-value" id="marginAmountDisplay">₹16,011</div>
+                        </div>
+                        <div class="result-box green">
+                            <div class="result-label">Margin %</div>
+                            <div class="result-value" id="marginPercentDisplay">37.2%</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Status</div>
+                            <div class="result-value" id="marginStatusDisplay">✓</div>
+                        </div>
+                    </div>
+                    <div id="warningBox"></div>
+                </div>
+
+                <div class="recommendation">
+                    <div class="rec-card green">
+                        <h3>✓ Calculated Price</h3>
+                        <div style="font-size: 20px; font-weight: 700; color: #059669;">₹<span id="recPrice">43,011</span></div>
+                        <div style="font-size: 11px; color: #666; margin-top: 8px;">Based on cost + overhead + markup + GST</div>
+                    </div>
+                    <div class="rec-card yellow" id="marginCard">
+                        <h3>✓ Margin is Healthy</h3>
+                        <div style="font-size: 20px; font-weight: 700; color: #d97706;" id="recMargin">37.2%</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 8px;">Good profitability</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card">
+            <h2>Edit Base Prices</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-weight: 700; color: #374151; margin-bottom: 12px;">GDA (General Daily Assistant)</h3>
+                <table class="price-table">
+                    <tr>
+                        <th>8-Hour</th>
+                        <th>12-Hour</th>
+                        <th>24-Hour</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" id="gda8" value="27500" step="500"></td>
+                        <td><input type="number" id="gda12" value="34500" step="500"></td>
+                        <td><input type="number" id="gda24" value="43000" step="500"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-weight: 700; color: #374151; margin-bottom: 12px;">ANM (Semi-Nurse)</h3>
+                <table class="price-table">
+                    <tr>
+                        <th>8-Hour</th>
+                        <th>12-Hour</th>
+                        <th>24-Hour</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" id="anm8" value="30500" step="500"></td>
+                        <td><input type="number" id="anm12" value="37500" step="500"></td>
+                        <td><input type="number" id="anm24" value="46500" step="500"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                <h3 style="font-weight: 700; color: #374151; margin-bottom: 12px;">Nurse (Full RN)</h3>
+                <table class="price-table">
+                    <tr>
+                        <th>8-Hour</th>
+                        <th>12-Hour</th>
+                        <th>24-Hour</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" id="nurse8" value="33500" step="500"></td>
+                        <td><input type="number" id="nurse12" value="46000" step="500"></td>
+                        <td><input type="number" id="nurse24" value="64500" step="500"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Dynamic Pricing Builder | Adjust inputs to explore pricing scenarios | Now includes GDA, ANM, and Nurse</p>
+        </div>
+    </div>
+
+    <script>
+        let currentDuration = '24';
+        let currentService = 'GDA';
+
+        const basePrices = {
+            'GDA': { '8': 27500, '12': 34500, '24': 43000 },
+            'ANM': { '8': 30500, '12': 37500, '24': 46500 },
+            'Nurse': { '8': 33500, '12': 46000, '24': 64500 }
+        };
+
+        function formatCurrency(value) {
+            return '₹' + Math.round(value).toLocaleString('en-IN');
+        }
+
+        function updateDisplay() {
+            const salary = parseFloat(document.getElementById('salary').value);
+            const overhead = parseFloat(document.getElementById('overhead').value);
+            const markup = parseFloat(document.getElementById('markup').value);
+            const gst = parseFloat(document.getElementById('gst').value);
+            const discount = parseFloat(document.getElementById('discount').value);
+
+            // Update display values
+            document.getElementById('overheadDisplay').textContent = overhead;
+            document.getElementById('markupDisplay').textContent = markup;
+            document.getElementById('gstDisplay').textContent = gst;
+            document.getElementById('discountDisplay').textContent = discount;
+
+            // Calculate
+            const overheadAmount = salary * (overhead / 100);
+            const totalCost = salary + overheadAmount;
+            const markupAmount = totalCost * (markup / 100);
+            const preGst = totalCost + markupAmount;
+            const gstAmount = preGst * (gst / 100);
+            const calculatedPrice = preGst + gstAmount;
+            const discountAmount = calculatedPrice * (discount / 100);
+            const finalPrice = calculatedPrice - discountAmount;
+            const finalMargin = finalPrice - totalCost;
+            const marginPercent = (finalMargin / finalPrice) * 100;
+
+            // Update cost breakdown
+            document.getElementById('salaryDisplay').textContent = formatCurrency(salary);
+            document.getElementById('overheadAmountDisplay').textContent = formatCurrency(overheadAmount);
+            document.getElementById('totalCostDisplay').textContent = formatCurrency(totalCost);
+
+            // Update price calculation
+            document.getElementById('costDisplay2').textContent = formatCurrency(totalCost);
+            document.getElementById('markupAmountDisplay').textContent = '+' + formatCurrency(markupAmount);
+            document.getElementById('preGstDisplay').textContent = formatCurrency(preGst);
+            document.getElementById('gstAmountDisplay').textContent = '+' + formatCurrency(gstAmount);
+            document.getElementById('calculatedPriceDisplay').textContent = formatCurrency(calculatedPrice);
+
+            // Update final price
+            document.getElementById('calcDisplay').textContent = formatCurrency(calculatedPrice);
+            
+            if (discount > 0) {
+                document.getElementById('discountRow').style.display = 'flex';
+                document.getElementById('discountAmountDisplay').textContent = '-' + formatCurrency(discountAmount);
+            } else {
+                document.getElementById('discountRow').style.display = 'none';
+            }
+            
+            document.getElementById('finalPriceDisplay').textContent = formatCurrency(finalPrice);
+
+            // Update margin
+            document.getElementById('marginAmountDisplay').textContent = formatCurrency(finalMargin);
+            document.getElementById('marginPercentDisplay').textContent = marginPercent.toFixed(1) + '%';
+
+            // Margin status
+            let status = '✓';
+            let statusText = 'Healthy';
+            let statusColor = 'green';
+            
+            if (marginPercent >= 25) {
+                status = '⭐';
+                statusText = 'Excellent';
+            } else if (marginPercent >= 20) {
+                status = '✓';
+                statusText = 'Healthy';
+            } else if (marginPercent >= 15) {
+                status = '✓';
+                statusText = 'Safe';
+            } else if (marginPercent >= 10) {
+                status = '⚠';
+                statusText = 'Acceptable';
+                statusColor = 'yellow';
+            } else if (marginPercent >= 8) {
+                status = '⚠';
+                statusText = 'Floor';
+                statusColor = 'yellow';
+            } else {
+                status = '✗';
+                statusText = 'VIOLATION';
+                statusColor = 'red';
+            }
+
+            document.getElementById('marginStatusDisplay').textContent = status + ' ' + statusText;
+
+            // Update margin card
+            const marginCard = document.getElementById('marginCard');
+            marginCard.className = 'rec-card ' + statusColor;
+            
+            let cardText = statusText;
+            let cardMessage = 'Good profitability';
+            if (marginPercent < 8) cardMessage = 'Below safe floor';
+            else if (marginPercent < 10) cardMessage = 'Margin floor risk';
+            else if (marginPercent < 15) cardMessage = 'Acceptable but tight';
+            
+            marginCard.innerHTML = `<h3>${status} Margin is ${cardText}</h3><div style="font-size: 20px; font-weight: 700; color: #374151;" id="recMargin">${marginPercent.toFixed(1)}%</div><div style="font-size: 11px; color: #666; margin-top: 8px;">${cardMessage}</div>`;
+
+            // Warning
+            const warningBox = document.getElementById('warningBox');
+            if (marginPercent < 8) {
+                warningBox.innerHTML = '<div class="warning">⚠️ MARGIN FLOOR VIOLATION - Margin is below 8% minimum. DO NOT offer this price.</div>';
+            } else {
+                warningBox.innerHTML = '';
+            }
+
+            // Recommendations
+            document.getElementById('recPrice').textContent = Math.round(calculatedPrice).toLocaleString('en-IN');
+            document.getElementById('recMargin').textContent = marginPercent.toFixed(1) + '%';
+        }
+
+        function setDuration(e, duration) {
+            currentDuration = duration;
+            document.querySelectorAll('.duration-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            updateDisplay();
+        }
+
+        function setDiscount(value) {
+            document.getElementById('discount').value = value;
+            document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+            if (value === 0) {
+                document.querySelectorAll('.quick-btn')[0].classList.add('active');
+            } else if (value === 5) {
+                document.querySelectorAll('.quick-btn')[1].classList.add('active');
+            } else if (value === 10) {
+                document.querySelectorAll('.quick-btn')[2].classList.add('active');
+            } else if (value === 15) {
+                document.querySelectorAll('.quick-btn')[3].classList.add('active');
+            } else if (value === 20) {
+                document.querySelectorAll('.quick-btn')[4].classList.add('active');
+            }
+            updateDisplay();
+        }
+
+        function resetForm() {
+            document.getElementById('salary').value = 25000;
+            document.getElementById('overhead').value = 8;
+            document.getElementById('markup').value = 35;
+            document.getElementById('gst').value = 18;
+            document.getElementById('discount').value = 0;
+            document.getElementById('serviceType').value = 'GDA';
+            currentDuration = '24';
+            currentService = 'GDA';
+            
+            document.querySelectorAll('.duration-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === 2);
+            });
+            document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+            
+            updateDisplay();
+        }
+
+        // Initial display
+        updateDisplay();
+    </script>
+</body>
+</html>
